@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "512135545107",
+    "project_id": "android-db-5440c",
+    "storage_bucket": "android-db-5440c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:512135545107:android:f7384295d758c8c6299ae6",
+        "android_client_info": {
+          "package_name": "com.example.agrifarm_sitani"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-uq6tlwH9glE_tFkopf0-wWogs8-g3Es"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:512135545107:android:9519cbba62d04ff7299ae6",
+        "android_client_info": {
+          "package_name": "com.example.modulbagiana"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-uq6tlwH9glE_tFkopf0-wWogs8-g3Es"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
