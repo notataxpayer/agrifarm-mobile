@@ -23,9 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.agrifarm_sitani.model.ScheduleItem
 import com.example.agrifarm_sitani.model.generatePlantingSchedule
+import com.example.agrifarm_sitani.data.repository.PlantingScheduleRepository
+import com.example.agrifarm_sitani.data.database.AppDatabase
 import java.text.SimpleDateFormat
 import java.util.*
 import java.time.LocalDate
+import kotlinx.coroutines.launch
 
 private val BackgroundCream = Color(0xFFFAF7F0)
 private val AccentGreen = Color(0xFF2F6B4B)
@@ -33,11 +36,25 @@ private val SoftGreen = Color(0xFF9BC6A6)
 private val CardGreen = Color(0xFFEAF3EC)
 private val MutedText = Color(0xFF6B6B6B)
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlantingCalendarScreen(onNavigateBack: () -> Unit) {
     var startDate by remember { mutableStateOf(Date()) }
     var showDatePicker by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val database: AppDatabase = remember {
+        androidx.room.Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "agrifarm_database"
+        )
+            .allowMainThreadQueries()
+            .build()
+    }
+    val repository = remember { PlantingScheduleRepository(database.plantingScheduleDao()) }
+    val coroutineScope = rememberCoroutineScope()
+
 
     val schedule = remember(startDate) {
         val calendar = Calendar.getInstance()
@@ -74,7 +91,11 @@ fun PlantingCalendarScreen(onNavigateBack: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onNavigateBack) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Kembali", tint = AccentGreen)
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Kembali",
+                        tint = AccentGreen
+                    )
                 }
                 Spacer(Modifier.width(8.dp))
                 Text(
@@ -122,7 +143,11 @@ fun PlantingCalendarScreen(onNavigateBack: () -> Unit) {
                                 SimpleDateFormat("dd MMMM yyyy", Locale("id")).format(startDate),
                                 color = MutedText
                             )
-                            Icon(Icons.Default.CalendarToday, contentDescription = null, tint = AccentGreen)
+                            Icon(
+                                Icons.Default.CalendarToday,
+                                contentDescription = null,
+                                tint = AccentGreen
+                            )
                         }
                     }
 
@@ -137,7 +162,12 @@ fun PlantingCalendarScreen(onNavigateBack: () -> Unit) {
                         colors = ButtonDefaults.buttonColors(containerColor = SoftGreen),
                         elevation = ButtonDefaults.buttonElevation(6.dp)
                     ) {
-                        Text("Buat Jadwal", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            "Buat Jadwal",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
             }
@@ -173,9 +203,29 @@ fun PlantingCalendarScreen(onNavigateBack: () -> Unit) {
             }
         )
     }
-}
+    Button(
+        onClick = {
+            coroutineScope.launch {
+                repository.saveSchedule(
+                    name = "Jadwal Tanam Baru", // <--- ADD THIS LINE
+                    startDate = startDate.time,
+                    items = schedule.scheduleItems
+                )
+                // Bisa tambahkan Toast atau Snackbar untuk notifikasi
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp),
+        shape = RoundedCornerShape(28.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = SoftGreen),
+        elevation = ButtonDefaults.buttonElevation(6.dp)
+    ) {
+        Text("Buat Jadwal", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+    }
 
-@Composable
+}
+    @Composable
 private fun ScheduleItemCard(item: ScheduleItem) {
     Card(
         modifier = Modifier

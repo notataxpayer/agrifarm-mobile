@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -19,18 +20,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.agrifarm_sitani.calculator.SeedCalculator
 import com.example.agrifarm_sitani.model.GenerasiBibit
+import com.example.agrifarm_sitani.data.database.AppDatabase
+import com.example.agrifarm_sitani.data.entity.SeedCalculationEntity
+import kotlinx.coroutines.launch
 
 private val BackgroundCream = Color(0xFFFAF7F0)
 private val AccentGreen = Color(0xFF2F6B4B)
 private val SoftGreen = Color(0xFF9BC6A6)
-private val CardGreen = Color(0xFFEAF3EC)
 private val MutedText = Color(0xFF6B6B6B)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SeedCalculatorScreen(onNavigateBack: () -> Unit = {}) {
+fun SeedCalculatorScreen(onNavigateBack: () -> Unit = {}, onNavigateToHistory: () -> Unit = {}) {
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("Hitung Kebutuhan Bibit", "Hitung Luas Lahan")
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val database = remember {
+        androidx.room.Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "agrifarm_database"
+        )
+        .allowMainThreadQueries() // Use coroutines in real app
+        .build()
+    }
+    val dao = remember { database.seedCalculationDao() }
+    val coroutineScope = rememberCoroutineScope()
 
     Surface(
         modifier = Modifier
@@ -58,8 +73,12 @@ fun SeedCalculatorScreen(onNavigateBack: () -> Unit = {}) {
                     "Kalkulator Bibit",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = AccentGreen
+                    color = AccentGreen,
+                    modifier = Modifier.weight(1f)
                 )
+                IconButton(onClick = onNavigateToHistory) {
+                     Icon(Icons.Default.History, "Riwayat", tint = AccentGreen)
+                }
             }
 
             Spacer(Modifier.height(16.dp))
@@ -89,15 +108,15 @@ fun SeedCalculatorScreen(onNavigateBack: () -> Unit = {}) {
             Spacer(Modifier.height(16.dp))
 
             when (selectedTab) {
-                0 -> NormalCalculatorTab()
-                1 -> ReverseCalculatorTab()
+                0 -> NormalCalculatorTab(dao, coroutineScope)
+                1 -> ReverseCalculatorTab(dao, coroutineScope)
             }
         }
     }
 }
 
 @Composable
-fun NormalCalculatorTab() {
+fun NormalCalculatorTab(dao: com.example.agrifarm_sitani.data.dao.SeedCalculationDao, scope: kotlinx.coroutines.CoroutineScope) {
     var panjangLahan by remember { mutableStateOf("") }
     var lebarLahan by remember { mutableStateOf("") }
     var lebarGuludan by remember { mutableStateOf("80") }
@@ -169,7 +188,7 @@ fun NormalCalculatorTab() {
                     estimasiHarga.toDoubleOrNull(), selectedUnit
                 )
                 result = calc?.let {
-                    buildString {
+                    val resultString = buildString {
                         appendLine("RINGKASAN LAHAN")
                         appendLine("Lebar Unit Tanam: ${String.format("%.2f", it.ringkasanLahan.lebarUnitTanam)} m")
                         appendLine("Jumlah Guludan: ${it.ringkasanLahan.jumlahGuludan} baris")
@@ -185,13 +204,25 @@ fun NormalCalculatorTab() {
                         appendLine("Note: ${it.kebutuhanBibit.note}")
                         it.estimasiBiaya?.let { b -> appendLine("\nESTIMASI BIAYA\nTotal: ${b.total}") }
                     }
+                    
+                    // Save to history
+                    scope.launch {
+                        val inputs = "Lahan: ${panjangLahan}x${lebarLahan}m, Jarak: ${jarakTanam}cm, Gen: ${selectedGenerasi.displayName}"
+                        dao.insertCalculation(SeedCalculationEntity(
+                            type = "Kebutuhan Bibit",
+                            inputDetails = inputs,
+                            resultSummary = resultString
+                        ))
+                    }
+                    
+                    resultString
                 } ?: "Input tidak valid"
             },
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = RoundedCornerShape(28.dp),
             colors = ButtonDefaults.buttonColors(containerColor = SoftGreen)
         ) {
-            Text("Hitung", color = Color.White, fontSize = 16.sp)
+            Text("Hitung & Simpan", color = Color.White, fontSize = 16.sp)
         }
 
         result?.let {
@@ -208,7 +239,7 @@ fun NormalCalculatorTab() {
 }
 
 @Composable
-fun ReverseCalculatorTab() {
+fun ReverseCalculatorTab(dao: com.example.agrifarm_sitani.data.dao.SeedCalculationDao, scope: kotlinx.coroutines.CoroutineScope) {
     var jumlahBibit by remember { mutableStateOf("") }
     var jarakTanam by remember { mutableStateOf("") }
     var lebarGuludan by remember { mutableStateOf("80") }
@@ -252,7 +283,7 @@ fun ReverseCalculatorTab() {
                     selectedGenerasi, jumlahPerKg.toIntOrNull()
                 )
                 result = calc?.let {
-                    buildString {
+                    val resultString = buildString {
                         appendLine("RINGKASAN")
                         appendLine("Estimasi Luas: ${String.format("%.1f", it.ringkasan.estimasiLuasM2)} m²")
                         appendLine("Jumlah Guludan: ${it.ringkasan.jumlahGuludan} baris")
@@ -263,13 +294,25 @@ fun ReverseCalculatorTab() {
                         appendLine()
                         appendLine(it.estimasiPopulasi.note)
                     }
+
+                    // Save to history
+                    scope.launch {
+                         val inputs = "Bibit: ${jumlahBibit}, Jarak: ${jarakTanam}cm, Gen: ${selectedGenerasi.displayName}"
+                         dao.insertCalculation(SeedCalculationEntity(
+                             type = "Luas Lahan",
+                             inputDetails = inputs,
+                             resultSummary = resultString
+                         ))
+                    }
+
+                    resultString
                 } ?: "Input tidak valid"
             },
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = RoundedCornerShape(28.dp),
             colors = ButtonDefaults.buttonColors(containerColor = SoftGreen)
         ) {
-            Text("Hitung", color = Color.White, fontSize = 16.sp)
+            Text("Hitung & Simpan", color = Color.White, fontSize = 16.sp)
         }
 
         result?.let {

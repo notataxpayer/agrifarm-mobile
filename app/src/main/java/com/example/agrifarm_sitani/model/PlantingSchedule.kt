@@ -1,6 +1,8 @@
 package com.example.agrifarm_sitani.model
 
 import java.time.LocalDate
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 data class PlantingSchedule(
     val startDate: LocalDate,
