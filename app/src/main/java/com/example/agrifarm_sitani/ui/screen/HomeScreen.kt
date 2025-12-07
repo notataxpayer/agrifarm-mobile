@@ -1,5 +1,7 @@
 package com.example.agrifarm_sitani.ui.screen
 
+import com.example.agrifarm_sitani.R
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,7 +11,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -17,13 +21,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val BackgroundCream = Color(0xFFFAF7F0)
-private val AccentGreen = Color(0xFF2F6B4B)
-private val SoftGreen = Color(0xFF9BC6A6)
+
+private val BackgroundCream = Color(0xFFF5EEDC)
+private val AccentGreen = Color(0xFF5D8B63)
+private val Green = Color(0xFF144224)
+private val SoftGreen = Color(0xFFAED483)
 private val CardGreen = Color(0xFFEAF3EC)
 private val MutedText = Color(0xFF6B6B6B)
 
@@ -36,18 +44,18 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundCream)
-            .padding(12.dp)
-            .border(6.dp, AccentGreen, RoundedCornerShape(24.dp)),
+            .padding(24.dp),
+//            .border(6.dp, AccentGreen, RoundedCornerShape(24.dp)),
         color = BackgroundCream
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(20.dp),
+                .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(16.dp))
             Text("TaniKu", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = AccentGreen)
             Text(
                 "Asisten Pintar untuk Petani Modern",
@@ -56,31 +64,15 @@ fun HomeScreen(
                 modifier = Modifier.padding(top = 4.dp, bottom = 18.dp)
             )
 
-            Box(
+            Image(
+                painter = painterResource(id = R.drawable.homescreen_image),
+                contentDescription = "Ilustrasi Beranda TaniKu",
                 modifier = Modifier
-                    .height(220.dp)
+                    .height(353.dp)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(Color(0xFFF0F6F1)),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(
-                        modifier = Modifier
-                            .size(110.dp)
-                            .clip(CircleShape)
-                            .background(SoftGreen),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.LocalFlorist,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(56.dp)
-                        )
-                    }
-                }
-            }
+//                    .clip(RoundedCornerShape(24.dp)),
+//                contentScale = ContentScale.Crop
+            )
 
             Spacer(Modifier.height(20.dp))
 
@@ -89,7 +81,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
                     .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = SoftGreen),
+                colors = ButtonDefaults.buttonColors(containerColor = Green),
                 shape = RoundedCornerShape(36.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp)
             ) {
@@ -103,13 +95,16 @@ fun HomeScreen(
                     title = "Jadwal Penanaman",
                     subtitle = "Atur jadwal perawatan bibit Anda",
                     iconTint = AccentGreen,
-                    onClick = onNavigateToPlantingCalendar
+                    onClick = onNavigateToPlantingCalendar,
+                    icon = Icons.Default.DateRange,
                 )
                 OptionCard(
                     title = "Kalkulator Bibit",
                     subtitle = "Hitung kebutuhan benih & lahan",
                     iconTint = AccentGreen,
-                    onClick = onNavigateToSeedCalculator
+                    onClick = onNavigateToSeedCalculator,
+                    icon = Icons.Default.Calculate,
+
                 )
             }
 
@@ -119,31 +114,31 @@ fun HomeScreen(
 }
 
 @Composable
-private fun OptionCard(title: String, subtitle: String, iconTint: Color, onClick: () -> Unit) {
+private fun OptionCard(title: String, subtitle: String, iconTint: Color, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(88.dp)
+            .height(90.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
-        Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(56.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(CardGreen),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(imageVector = Icons.Default.CalendarToday, contentDescription = null, tint = iconTint)
+                Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(36.dp))
             }
 
             Spacer(Modifier.width(12.dp))
 
             Column {
-                Text(title, fontWeight = FontWeight.SemiBold, color = AccentGreen)
+                Text(title, fontWeight = FontWeight.SemiBold, color = AccentGreen, fontSize = 16.sp)
                 Text(subtitle, color = MutedText, fontSize = 13.sp)
             }
         }
