@@ -31,8 +31,7 @@ import androidx.compose.ui.unit.sp
 private val BackgroundCream = Color(0xFFF5EEDC)
 private val AccentGreen = Color(0xFF5D8B63)
 private val Green = Color(0xFF144224)
-private val SoftGreen = Color(0xFFAED483)
-private val CardGreen = Color(0xFFEAF3EC)
+private val SoftGreen = Color(0xFFAED4B3)
 private val MutedText = Color(0xFF6B6B6B)
 
 @Composable
@@ -45,7 +44,6 @@ fun HomeScreen(
             .fillMaxSize()
             .background(BackgroundCream)
             .padding(24.dp),
-//            .border(6.dp, AccentGreen, RoundedCornerShape(24.dp)),
         color = BackgroundCream
     ) {
         Column(
@@ -129,7 +127,7 @@ private fun OptionCard(title: String, subtitle: String, iconTint: Color, icon: a
                 modifier = Modifier
                     .size(56.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(CardGreen),
+                    .background(SoftGreen),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(36.dp))

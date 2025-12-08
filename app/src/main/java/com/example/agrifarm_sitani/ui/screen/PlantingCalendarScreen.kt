@@ -34,12 +34,12 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.launch
 
-private val BackgroundCream = Color(0xFFFAF7F0)
-private val AccentGreen = Color(0xFF2F6B4B)
-private val SoftGreen = Color(0xFF9BC6A6)
-private val CardGreen = Color(0xFFEAF3EC)
-private val CardBrown = Color(0xFFF5EFE6) // Light Brown for alternating cards
+private val BackgroundCream = Color(0xFFF5EEDC)
+private val AccentGreen = Color(0xFF5D8B63)
+private val Green = Color(0xFF144224)
+private val SoftGreen = Color(0xFFAED4B3)
 private val MutedText = Color(0xFF6B6B6B)
+private val CardBrown = Color(0xFFDDB892) // Light Brown for alternating cards
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,8 +69,7 @@ fun PlantingCalendarScreen(onNavigateBack: () -> Unit, onNavigateToHistory: () -
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundCream)
-            .padding(12.dp)
-            .border(6.dp, AccentGreen, RoundedCornerShape(24.dp)),
+            .padding(24.dp),
         color = BackgroundCream
     ) {
         Scaffold(
@@ -81,7 +80,7 @@ fun PlantingCalendarScreen(onNavigateBack: () -> Unit, onNavigateToHistory: () -
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(20.dp)
+                    .padding(4.dp,0.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -113,11 +112,10 @@ fun PlantingCalendarScreen(onNavigateBack: () -> Unit, onNavigateToHistory: () -
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(8.dp)
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Text(
-                            "Pengaturan Jadwal",
+                            "Informasi Tanam",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = AccentGreen
@@ -125,10 +123,16 @@ fun PlantingCalendarScreen(onNavigateBack: () -> Unit, onNavigateToHistory: () -
                         Spacer(Modifier.height(12.dp))
 
                         // Name Input
+                        Text(
+                            "Nama Tanaman",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = AccentGreen,
+
+                        )
                         OutlinedTextField(
                             value = scheduleName,
                             onValueChange = { scheduleName = it },
-                            label = { Text("Nama Tanaman / Jadwal") },
                             placeholder = { Text("Contoh: Jagung Manis") },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
@@ -136,11 +140,21 @@ fun PlantingCalendarScreen(onNavigateBack: () -> Unit, onNavigateToHistory: () -
                                 focusedBorderColor = SoftGreen,
                                 unfocusedBorderColor = Color(0xFFE0E0E0),
                                 focusedLabelColor = AccentGreen
-                            )
+                            ),
+                            textStyle = androidx.compose.ui.text.TextStyle(
+                                fontSize = 16.sp,
+                                color = MutedText
+                            ),
                         )
 
                         Spacer(Modifier.height(12.dp))
 
+                        Text(
+                            "Tanggal Tanam",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = AccentGreen
+                        )
                         OutlinedButton(
                             onClick = { showDatePicker = true },
                             modifier = Modifier
@@ -199,7 +213,7 @@ fun PlantingCalendarScreen(onNavigateBack: () -> Unit, onNavigateToHistory: () -
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(52.dp),
-                            shape = RoundedCornerShape(28.dp),
+                            shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = SoftGreen),
                             elevation = ButtonDefaults.buttonElevation(6.dp)
                         ) {
@@ -231,7 +245,7 @@ fun PlantingCalendarScreen(onNavigateBack: () -> Unit, onNavigateToHistory: () -
                         itemsIndexed(currentSchedule.scheduleItems) { index, item ->
                             // Alternate colors: Even index = Green (CardGreen), Odd index = Brown (CardBrown)
                             // Note: index starts at 0. 0=Green, 1=Brown, 2=Green...
-                            val backgroundColor = if (index % 2 == 0) CardGreen else CardBrown
+                            val backgroundColor = if (index % 2 == 0) SoftGreen else CardBrown
                             ScheduleItemCard(item, backgroundColor)
                         }
                     }
@@ -275,10 +289,10 @@ private fun ScheduleItemCard(item: ScheduleItem, backgroundColor: Color) {
             .wrapContentHeight(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = backgroundColor), // Use dynamic background color
-        elevation = CardDefaults.cardElevation(4.dp)
+
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(24.dp, 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Icon background should contrast with card background. 
@@ -288,7 +302,8 @@ private fun ScheduleItemCard(item: ScheduleItem, backgroundColor: Color) {
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White.copy(alpha = 0.6f)), 
+                    .background(Color.White)
+                    ,
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -299,11 +314,11 @@ private fun ScheduleItemCard(item: ScheduleItem, backgroundColor: Color) {
                     },
                     contentDescription = null,
                     tint = AccentGreen,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(36.dp)
                 )
             }
 
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(24.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -312,10 +327,8 @@ private fun ScheduleItemCard(item: ScheduleItem, backgroundColor: Color) {
                     color = AccentGreen,
                     fontSize = 15.sp
                 )
-                Spacer(Modifier.height(4.dp))
                 Text("Hari ke-${item.day} ($formattedDate)", color = MutedText, fontSize = 13.sp)
                 if (item.description.isNotEmpty()) {
-                    Spacer(Modifier.height(2.dp))
                     Text(item.description, color = MutedText, fontSize = 12.sp)
                 }
             }

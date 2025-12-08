@@ -21,11 +21,13 @@ import com.example.agrifarm_sitani.data.entity.SeedCalculationEntity
 import java.text.SimpleDateFormat
 import java.util.*
 
-private val BackgroundCream = Color(0xFFFAF7F0)
-private val AccentGreen = Color(0xFF2F6B4B)
-private val SoftGreen = Color(0xFF9BC6A6)
-private val CardGreen = Color(0xFFEAF3EC)
+private val BackgroundCream = Color(0xFFF5EEDC)
+private val AccentGreen = Color(0xFF5D8B63)
+private val Green = Color(0xFF144224)
+private val SoftGreen = Color(0xFFAED4B3)
 private val MutedText = Color(0xFF6B6B6B)
+private val CardBrown = Color(0xFFDDB892)
+private val CardGreen = Color(0xFFEAF3EC)
 
 @Composable
 fun CalculationHistoryScreen(onNavigateBack: () -> Unit) {
@@ -46,14 +48,14 @@ fun CalculationHistoryScreen(onNavigateBack: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundCream)
-            .padding(12.dp)
-            .border(6.dp, AccentGreen, RoundedCornerShape(24.dp)),
+            .padding(12.dp),
+
         color = BackgroundCream
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp)
+                .padding(4.dp, 20.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
